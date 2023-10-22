@@ -1,5 +1,6 @@
 import 'package:clone_instagram/data/posts.dart';
 import 'package:clone_instagram/data/stories.dart';
+import 'package:clone_instagram/widgets/bottom_bar.dart';
 import 'package:clone_instagram/widgets/post.dart';
 import 'package:clone_instagram/widgets/story.dart';
 import 'package:flutter/material.dart';
@@ -33,14 +34,14 @@ List<PopupMenuEntry> renderPopupMenuItemAppBar(BuildContext context) {
   ];
 }
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeScreenState extends State<HomeScreen> {
   late int currentIndex;
 
   @override
@@ -54,6 +55,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -146,87 +148,8 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.black,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: Icon(
-                Icons.home,
-                size: 35,
-                color: currentIndex == 0 ? Colors.blue : Colors.white,
-              ),
-              onPressed: () => {
-                setState(() {
-                  currentIndex = 0;
-                })
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.search,
-                size: 35,
-                color: currentIndex == 1 ? Colors.blue : Colors.white,
-              ),
-              onPressed: () => {
-                setState(() {
-                  currentIndex = 1;
-                })
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.add_box_outlined,
-                size: 35,
-                color: currentIndex == 2 ? Colors.blue : Colors.white,
-              ),
-              onPressed: () => {
-                setState(() {
-                  currentIndex = 2;
-                })
-              },
-            ),
-            IconButton(
-              icon: SvgPicture.asset(
-                'assets/images/reels.svg',
-                colorFilter: ColorFilter.mode(
-                    currentIndex == 3 ? Colors.blue : Colors.white,
-                    BlendMode.srcIn),
-                width: 35,
-                height: 35,
-              ),
-              onPressed: () => {
-                setState(() {
-                  currentIndex = 3;
-                })
-              },
-            ),
-            IconButton(
-              icon: Container(
-                decoration: currentIndex == 4
-                    ? BoxDecoration(
-                        border: Border.all(
-                          width: 3,
-                          color: Colors.blue,
-                        ),
-                        borderRadius: BorderRadius.circular(50),
-                      )
-                    : const BoxDecoration(),
-                child: const CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/avatar.jpg'),
-                  radius: 20,
-                ),
-              ),
-              onPressed: () => {
-                setState(() {
-                  currentIndex = 4;
-                })
-              },
-            ),
-          ],
-        ),
+      bottomNavigationBar: const BottomBarWidget(
+        currentIndex: 0,
       ),
     );
   }

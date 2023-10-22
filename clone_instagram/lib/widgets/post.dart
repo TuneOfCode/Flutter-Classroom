@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:clone_instagram/constants/home.constant.dart';
+import 'package:clone_instagram/widgets/post_modal_bottom_sheet.dart';
 import 'package:clone_instagram/widgets/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -43,6 +44,7 @@ class _PostState extends State<Post> {
   late bool _isLiked;
   late int _likeCount;
   late bool _isSeeMore;
+  late bool _isHideShareAndLink;
 
   @override
   void initState() {
@@ -51,6 +53,7 @@ class _PostState extends State<Post> {
     _isLiked = widget.isLiked;
     _likeCount = widget.likeCount;
     _isSeeMore = false;
+    _isHideShareAndLink = false;
   }
 
   @override
@@ -124,38 +127,85 @@ class _PostState extends State<Post> {
           trailing: IconButton(
             icon: const Icon(Icons.more_vert),
             color: Colors.white,
-            onPressed: () => {},
+            onPressed: () {
+              setState(() {
+                _isHideShareAndLink = false;
+              });
+              showModalBottomSheet(
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                context: context,
+                builder: (BuildContext context) {
+                  return PostModalBottomSheetWidget(
+                    isHideShareAndLink: _isHideShareAndLink,
+                  );
+                },
+              );
+            },
           ),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InkWell(
-              child: CarouselSlider(
-                options: CarouselOptions(
-                  height: 333,
-                  viewportFraction: 1,
-                  aspectRatio: 2.0,
-                  initialPage: _currentSlideIndex,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _currentSlideIndex = index;
-                    });
-                  },
-                ),
-                items: widget.assets.map(
-                  (asset) {
-                    if (asset.contains('mp4') ||
-                        asset.contains('mov') ||
-                        asset.contains('mp3')) {
-                      return VideoPlayerWidget(url: asset);
-                    }
-                    return Image.asset(
-                      asset,
+              child: Stack(
+                children: [
+                  if (widget.assets.length == 1) ...[
+                    Image.asset(
+                      widget.assets[0],
                       fit: BoxFit.cover,
-                    );
-                  },
-                ).toList(),
+                    ),
+                  ] else ...[
+                    CarouselSlider(
+                      options: CarouselOptions(
+                        height: 333,
+                        viewportFraction: 1,
+                        aspectRatio: 2.0,
+                        initialPage: _currentSlideIndex,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentSlideIndex = index;
+                          });
+                        },
+                      ),
+                      items: widget.assets.map(
+                        (asset) {
+                          if (asset.contains('mp4') ||
+                              asset.contains('mov') ||
+                              asset.contains('mp3')) {
+                            return VideoPlayerWidget(
+                              url: asset,
+                              isVideoProgressIndicator: true,
+                            );
+                          }
+                          return Image.asset(
+                            asset,
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ).toList(),
+                    ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Text(
+                          '${_currentSlideIndex + 1}/${widget.assets.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
               onDoubleTap: () {
                 setState(() {
@@ -199,25 +249,27 @@ class _PostState extends State<Post> {
                   ),
                   onPressed: () {},
                 ),
-                SizedBox(
-                  width: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: widget.assets.map((asset) {
-                      int index = widget.assets.indexOf(asset);
-                      return Container(
-                          width: 6,
-                          height: 6,
-                          margin: const EdgeInsets.symmetric(horizontal: 2),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _currentSlideIndex == index
-                                ? Colors.blue
-                                : Colors.white,
-                          ));
-                    }).toList(),
+                if (widget.assets.length > 1) ...[
+                  SizedBox(
+                    width: 100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: widget.assets.map((asset) {
+                        int index = widget.assets.indexOf(asset);
+                        return Container(
+                            width: 6,
+                            height: 6,
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentSlideIndex == index
+                                  ? Colors.blue
+                                  : Colors.white,
+                            ));
+                      }).toList(),
+                    ),
                   ),
-                ),
+                ],
                 const Spacer(),
                 IconButton(
                   icon: SvgPicture.asset(

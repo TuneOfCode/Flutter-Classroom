@@ -11,9 +11,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: "Clone Instagram",
-      home: Home(),
+      theme: ThemeData(
+        colorScheme: const ColorScheme.highContrastDark(),
+      ),
+      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
